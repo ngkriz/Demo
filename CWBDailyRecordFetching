@@ -1,0 +1,88 @@
+# pull temp data from observation
+def obsfinder():
+    messtext=data.text
+    observations = messtext.split('<tr class="second_tr">')[1].lstrip().split('</tbody>')[0]
+
+    YY=int(Year)
+    MM=int(Month)
+    
+    from calendar import monthrange
+    day=monthrange(YY, MM)[1]
+        
+    for i in range (1,day+1):
+        selectmonth = observations.split('<td nowrap>')[i].lstrip().split('</tr>')[0]
+        
+        
+        extractdate = selectmonth.split('<td nowrap>')[0].lstrip().split('</td>')[0]
+        extractTemp = selectmonth.split('<td>')[7].lstrip().split('&nbsp;</td>')[0]
+        extractTmax = selectmonth.split('<td>')[8].lstrip().split('&nbsp;</td>')[0]
+        extractPrecip = selectmonth.split('<td>')[21].lstrip().split('&nbsp;</td>')[0]
+        extractPrecipHour = selectmonth.split('<td>')[22].lstrip().split('&nbsp;</td>')[0]
+        extractPrecipMax10 = selectmonth.split('<td>')[23].lstrip().split('&nbsp;</td>')[0]
+        
+
+ 
+    
+        obsdata["Year"].append(YY)
+        obsdata["Month"].append(M)
+        obsdata["Day"].append(i)
+        obsdata["Temp"].append(extractTemp)
+        obsdata["Tmax"].append(extractTmax)
+        obsdata["Precip"].append(extractPrecip)
+        obsdata["PrecipHour"].append(extractPrecipHour)
+        obsdata["PrecipMax10"].append(extractPrecipMax10)
+        
+        print (Y+" "+M+" "+ extractdate + " "  + extractPrecip  + " " + extractPrecipHour + " " +  extractPrecipMax10)
+
+
+
+    
+
+
+
+## end of functions
+
+
+
+## Start the execution
+
+# 1.input the link from CWB eg: https://e-service.cwb.gov.tw/HistoryDataQuery/YearDataController.do?command=viewMain&station=466920&stname=%25E8%2587%25BA%25E5%258C%2597&datepicker=1997
+print ('Enter station link. Sample: ')
+Link = str(input("https://e-service.cwb.gov.tw/HistoryDataQuery/MonthDataController.do?command=viewMain&station=C0G640&stname=%25E9%25B9%25BF%25E6%25B8%25AF&datepicker=2000-05&altitude=17m"))
+
+link0 = Link.split('datepicker=')[0].lstrip()+'datepicker='
+link1 = Link.split('datepicker=')[1].lstrip().split('&')[0]
+Alt = '&'+Link.split('datepicker=')[1].lstrip().split('&')[1]
+
+
+print ()
+Startyear = int(input("Enter the starting year (from 1995): "))
+Endyear = int(input("Enter the end year (up to 2021): "))
+
+Fulllink= link0 +"2020-01"+Alt
+import requests 
+data = requests.get(Fulllink)
+location = data.text.split('encodeURI("')[1].lstrip().split('")')[0]
+
+print ('Processing '+ str(Startyear) + ' - ' + str(Endyear) + ' of ' + location)
+Cont = str(input("Do you want to continue? Y/N"))
+if Cont =="N":
+    print ('~~~~~~~~~~ Program terminated by user. ~~~~~~~~~~')
+    a = 1/0
+    
+
+print ("YYYY MM DD Precip PrecipHour PrecipMax10Mins")
+
+
+obsdata = {"Year":[],"Month":[],"Day":[],"Temp":[],"Tmax":[],"Precip":[],"PrecipHour":[],"PrecipMax10":[]}
+
+for Year in range (Startyear,Endyear +1):
+    Y = str(Year)
+    for Month in range (1,13):
+        M = str(Month)
+        if Month<10:
+            M='0'+M
+        url = link0 + Y + '-'+ M+ Alt
+        data = requests.get(url)
+        obsfinder()
+
