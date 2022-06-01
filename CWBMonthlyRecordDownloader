@@ -1,0 +1,73 @@
+##functions
+
+
+
+
+# pull temp data from observation
+def obsfinder():
+    messtext=data.text
+    observations = messtext.split('<tr class="second_tr">')[1].lstrip().split('</tbody>')[0]
+
+
+
+        
+    for i in range (1,13):
+        selectmonth = observations.split('<td nowrap>')[i].lstrip().split('</tr>')[0]
+        
+        
+       ###insert here
+        extractdate = selectmonth.split('<td nowrap>')[0].lstrip().split('</td>')[0]
+        extractTemp = selectmonth.split('<td>')[7].lstrip().split('&nbsp;</td>')[0]
+        extractTmax = selectmonth.split('<td>')[8].lstrip().split('&nbsp;</td>')[0]
+        extractPrecip = selectmonth.split('<td>')[18].lstrip().split('&nbsp;</td>')[0]
+        extractPrecipHour = selectmonth.split('<td>')[19].lstrip().split('&nbsp;</td>')[0]
+        extractPrecipMax10 = selectmonth.split('<td>')[21].lstrip().split('&nbsp;</td>')[0]
+
+
+ 
+    
+    
+        obsdata["Date"].append(Y+ extractdate)
+        obsdata["Temp"].append(extractTemp)
+        obsdata["Tmax"].append(extractTmax)
+        obsdata["Precip"].append(extractPrecip)
+        obsdata["PrecipHour"].append(extractPrecipHour)
+        obsdata["PrecipMax10"].append(extractPrecipMax10)
+
+        print (Y+" "+ extractdate + " "  + extractPrecip  + " " + extractPrecipHour + " " +  extractPrecipMax10)
+
+## end of functions
+
+
+
+
+
+
+
+
+
+
+
+## Start the execution
+
+# 1.input the link from CWB eg: https://e-service.cwb.gov.tw/HistoryDataQuery/
+Link = str(input("Enter the link. Example: https://e-service.cwb.gov.tw/HistoryDataQuery/YearDataController.do?command=viewMain&station=466920&stname=%25E8%2587%25BA%25E5%258C%2597&datepicker=2017&altitude=5.3m"))
+
+link0 = Link.split('datepicker=')[0].lstrip()+'datepicker='
+link1 = Link.split('datepicker=')[1].lstrip().split('&')[0]
+Alt = '&'+Link.split('datepicker=')[1].lstrip().split('&')[1]
+
+
+import requests  
+obsdata={"Date":[],"Temp":[],"Tmax":[],"Precip":[],"PrecipHour":[],"PrecipMax10":[]}
+
+for Year in range (2000,2022):
+    Y = str(Year)
+    url = link0 + Y + Alt
+    data = requests.get(url)
+    obsfinder()
+
+
+
+
+
